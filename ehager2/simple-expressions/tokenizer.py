@@ -42,6 +42,14 @@ def tokenize(characters):
                 token["value"] = float(token["value"])
             else:
                 token["value"] = int(token["value"])
+
+    #Add an null token to signify the end of it 
+    token = {
+        "tag": None,
+        "value": None,
+        "position": position
+    }
+    tokens.append(token)
     return tokens
 
 

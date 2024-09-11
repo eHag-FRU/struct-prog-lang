@@ -94,6 +94,15 @@ def test_parse_term():
     """
     term = factor { "*"|"/" factor }
     """
+    print("testing parse_simple_expression")
+    tokens = tokenize("2*3")
+    ast, tokens = parse_simple_expression(tokens)
+    pprint(ast)
+    assert (ast == {
+                "left": {"position": 0, "tag": "number", "value": 2}, 
+                "right": {"position": 2, "tag": "number", "value": 3}, 
+                "tag": "*",
+            })
     pass
 
 
@@ -113,10 +122,21 @@ def test_parse_expression():
     """
     expression = term { "+"|"-" term }
     """
+
+    parse_expression()
+
     pass
 
+def parse(tokens):
+    return parse_expression(tokens)
+
+
+def test_parse():
+    assert parse()
 
 if __name__ == "__main__":
     test_parse_simple_expression()
     test_parse_factor()
+    test_parse_term()
+    test_parse_expression()
     print("done")
