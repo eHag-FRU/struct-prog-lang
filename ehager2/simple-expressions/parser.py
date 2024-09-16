@@ -152,7 +152,7 @@ def test_parse_term():
                                                                 'tag': '*'},
                                                         'right': {'position': 4,
                                                                 'tag': 'number',
-                                                                'value': 2},-+++
+                                                                'value': 2},
                                                         'tag': '*'},
                                                 'right': {'position': 6,
                                                         'tag': 'number',
@@ -261,12 +261,20 @@ def test_parse_expression():
 
 
 def parse(tokens):
-    return parse_expression(tokens)
+    ast, tokens = parse_expression(tokens)
+    return ast
     
+
+def test_parse():
+    print("testing parse")
+    tokens = tokenize("2+3*4+5")
+    ast, _ = parse_expression(tokens)
+    assert parse(tokens) == ast
 
 if __name__ == "__main__":
     test_parse_simple_expression()
     test_parse_factor()
     test_parse_term()
     test_parse_expression()
+    test_parse()
     print("done")
