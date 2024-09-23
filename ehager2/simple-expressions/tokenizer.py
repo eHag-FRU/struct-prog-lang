@@ -42,13 +42,11 @@ def tokenize(characters):
                 token["value"] = float(token["value"])
             else:
                 token["value"] = int(token["value"])
-
-    #Add an null token to signify the end of it 
     token = {
-        "tag": None,
-        "value": None,
-        "position": position
-    }
+            "tag": None,
+            "value": None,
+            "position": position,
+        }
     tokens.append(token)
     return tokens
 
@@ -56,9 +54,7 @@ def tokenize(characters):
 def test_simple_tokens():
     print("testing simple tokens")
     assert tokenize("+") == [{'tag': '+', 'value': '+', 'position': 0}, {'tag': None, 'value': None, 'position': 1}]
-    assert tokenize("-") == [{"tag": "-", "value": "-", "position": 0}]
-    exit(0)
-    
+    assert tokenize("-") == [{"tag": "-", "value": "-", "position": 0}, {'tag': None, 'value': None, 'position': 1} ]
     i = 0
     for char in "+-*/()":
         tokens = tokenize(char)

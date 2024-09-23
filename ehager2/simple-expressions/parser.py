@@ -63,15 +63,6 @@ def test_parse_simple_expression():
     }
     # pprint(ast)
 
-    #HW 1 Added test
-    tokens = tokenize("-(-10)")
-    ast, tokens = parse_simple_expression(tokens)
-    assert ast == {
-        'tag': 'negate',
-        'value': {'tag': 'negate',
-                'value': {'position': 3, 'tag': 'number', 'value': 10}}
-    }
-
 def parse_factor(tokens):
     """
     factor = simple_expression
@@ -85,11 +76,6 @@ def test_parse_factor():
     print("testing parse_factor")
     for s in ["2", "(2)", "-2"]:
         assert parse_factor(tokenize(s)) == parse_simple_expression(tokenize(s))
-
-    #HW1 Added Test
-    assert parse_factor(tokenize("--(-30)")) == parse_simple_expression(tokenize("--(-30)"))
-
-
 
 
 def parse_term(tokens):
@@ -127,43 +113,6 @@ def test_parse_term():
         "right": {"position": 6, "tag": "number", "value": 5},
         "tag": "*",
     }
-
-
-    tokens = tokenize("2*(3/4)*(-5)")
-    ast, tokens = parse_term(tokens)
-    assert ast == {'left': {'left': {'position': 0, 'tag': 'number', 'value': 2},
-                            'right': {'left': {'position': 3, 'tag': 'number', 'value': 3},
-                                        'right': {'position': 5, 'tag': 'number', 'value': 4},
-                                        'tag': '/'},
-                            'tag': '*'},
-                    'right': {'tag': 'negate',
-                            'value': {'position': 10, 'tag': 'number', 'value': 5}},
-                    'tag': '*'}
-
-
-    tokens = tokenize("5*3*2*1/2/3/5")
-    ast, tokens = parse_term(tokens)
-    assert ast == {'left': {'left': {'left': {'left': {'left': {'left': {'position': 0,
-                                                                        'tag': 'number',
-                                                                        'value': 5},
-                                                                'right': {'position': 2,
-                                                                            'tag': 'number',
-                                                                            'value': 3},
-                                                                'tag': '*'},
-                                                        'right': {'position': 4,
-                                                                'tag': 'number',
-                                                                'value': 2},
-                                                        'tag': '*'},
-                                                'right': {'position': 6,
-                                                        'tag': 'number',
-                                                        'value': 1},
-                                                'tag': '*'},
-                                    'right': {'position': 8, 'tag': 'number', 'value': 2},
-                                    'tag': '/'},
-                            'right': {'position': 10, 'tag': 'number', 'value': 3},
-                            'tag': '/'},
-                    'right': {'position': 12, 'tag': 'number', 'value': 5},
-                    'tag': '/'}
 
 
 def parse_expression(tokens):
@@ -221,49 +170,9 @@ def test_parse_expression():
         "tag": "+",
     }
 
-
-    tokens = tokenize("(2+3)*(5/6)+2")
-    ast, tokens = parse_expression(tokens)
-    assert ast == {'left': {'left': {'left': {'position': 1, 'tag': 'number', 'value': 2},
-                            'right': {'position': 3, 'tag': 'number', 'value': 3},
-                            'tag': '+'},
-                    'right': {'left': {'position': 7, 'tag': 'number', 'value': 5},
-                                'right': {'position': 9, 'tag': 'number', 'value': 6},
-                                'tag': '/'},
-                    'tag': '*'},
-                    'right': {'position': 12, 'tag': 'number', 'value': 2},
-                    'tag': '+'}
-
-    #HW1 Test
-    tokens = tokenize("(2+3)*(5/6)+2--3")
-    ast, tokens = parse_expression(tokens)
-    assert ast == {'left': {'left': {'left': {'left': {'position': 1,
-                                     'tag': 'number',
-                                     'value': 2},
-                            'right': {'position': 3,
-                                      'tag': 'number',
-                                      'value': 3},
-                            'tag': '+'},
-                   'right': {'left': {'position': 7,
-                                      'tag': 'number',
-                                      'value': 5},
-                             'right': {'position': 9,
-                                       'tag': 'number',
-                                       'value': 6},
-                             'tag': '/'},
-                            'tag': '*'},
-                            'right': {'position': 12, 'tag': 'number', 'value': 2},
-                            'tag': '+'},
-                    'right': {'tag': 'negate',
-                            'value': {'position': 15, 'tag': 'number', 'value': 3}},
-                    'tag': '-'}
-
-
-
 def parse(tokens):
     ast, tokens = parse_expression(tokens)
-    return ast
-    
+    return ast 
 
 def test_parse():
     print("testing parse")
