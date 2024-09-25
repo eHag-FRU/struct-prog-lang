@@ -121,11 +121,13 @@ def test_evaluate_negation():
     equals("-2",{},-2,{})
     equals("--3",{},3,{})
 
+
 def test_print_statement():
     print("test print statement")
-    equals("print(77)", {}, None, {})
-    equals("print()",{},None,{})
-    equals("print(50+7)",{},None,{})
+    
+    equals("print()", {}, None, {})
+    equals("print(50+7)", {}, None, {})
+
 
 if __name__ == "__main__":
     test_evaluate_single_value()
