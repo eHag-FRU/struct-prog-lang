@@ -33,7 +33,7 @@ patterns = [
     ["\\&\\&", "&&"],
     ["\\|\\|", "||"],
     ["!", "!"],
-    ["[ \t\n]+","whitespace"]
+    ["[ \t\n]+","whitespace"],
 ]
 
 for pattern in patterns:
@@ -68,7 +68,6 @@ def tokenize(characters):
             "value": None,
             "position": position,
         }
-
     tokens.append(token)
     return tokens
 
@@ -87,7 +86,7 @@ def test_simple_tokens():
         tokens = tokenize(characters)
         assert (
             tokens[0]["tag"] == characters
-        ), f"Expecting {characters}, got {tokens[0]["tag"]}"
+        ), f"Expecting {[characters]}, got {[tokens[0]["tag"]]}"
         assert tokens[0]["value"] == characters
     for number in ["123.45", "1.", ".1", "123"]:
         tokens = tokenize(number)
@@ -105,13 +104,12 @@ def test_whitespace():
     print("testing whitespace")
     for s in [" ", "\t", "\n"]:
         tokens = tokenize(s)
-
-        #THIS IS A DESIGN DESCISION!!!
-        #EITHER DISCARD OR SIGNIFICANT, BASED ON LANGUAGE!!!!
-        assert tokens == [{'tag': None, "value": None, 'position': 1}]
-        #assert tokens[0]["tag"] == "whitespace"
-
-        #assert tokenize("1 + 2 / 3\t-4\n*5") == tokenize("1+2/3\t-4\n*5")
+        assert tokens == [{"tag": None, "value": None, "position": 1}]
+    t1 = tokenize("1 + 2 / 3\t-4\n*5")
+    t2 = tokenize("1+2/3-4*5")
+    t1 = [{"tag":i["tag"], "value":i["value"]} for i in t1]
+    t2 = [{"tag":i["tag"], "value":i["value"]} for i in t2]
+    assert t1==t2
 
 if __name__ == "__main__":
     test_simple_tokens()
