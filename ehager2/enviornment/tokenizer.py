@@ -33,6 +33,7 @@ patterns = [
     ["\\&\\&", "&&"],
     ["\\|\\|", "||"],
     ["!", "!"],
+    ["[ \t\n]+","whitespace"]
 ]
 
 for pattern in patterns:
@@ -48,12 +49,13 @@ def tokenize(characters):
             if match:
                 break
         assert match, f"Did not find a match for {characters[position:]}"
-        token = {
-            "tag": tag,
-            "value": match.group(0),
-            "position": position,
-        }
-        tokens.append(token)
+        if tag != 'whitespace':
+            token = {
+                "tag": tag,
+                "value": match.group(0),
+                "position": position,
+            }
+            tokens.append(token)
         position = match.end()
     for token in tokens:
         if token["tag"] == "number":
@@ -66,6 +68,7 @@ def tokenize(characters):
             "value": None,
             "position": position,
         }
+
     tokens.append(token)
     return tokens
 
@@ -102,9 +105,16 @@ def test_whitespace():
     print("testing whitespace")
     for s in [" ", "\t", "\n"]:
         tokens = tokenize(s)
-        assert tokens[0]["tag"] == "whitespace"
+
+        #THIS IS A DESIGN DESCISION!!!
+        #EITHER DISCARD OR SIGNIFICANT, BASED ON LANGUAGE!!!!
+        assert tokens == [{'tag': None, "value": None, 'position': 1}]
+        #assert tokens[0]["tag"] == "whitespace"
+
+        #assert tokenize("1 + 2 / 3\t-4\n*5") == tokenize("1+2/3\t-4\n*5")
 
 if __name__ == "__main__":
     test_simple_tokens()
     test_identifier_tokens()
+    test_whitespace()
     print("done.")
