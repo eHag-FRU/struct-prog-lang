@@ -84,7 +84,7 @@ def evaluate(ast, environment):
         #While there is still an AST, None == false
         while ast:
             assert "statement" in ast
-            value, _ = evaluate(ast["value"], environment)
+            value, _ = evaluate(ast["statement"], environment)
             ast = ast["list"]
         return None, False
 
