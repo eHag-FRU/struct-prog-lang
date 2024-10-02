@@ -370,42 +370,38 @@ def test_parse_statement():
 def parse_statement_list(tokens):
     """
     statement_list = statement { ";" statement } {";"}
-    """   
+    """
     ast, tokens = parse_statement(tokens)
-    if tokens[0]["tag"] != ";":
+    if tokens[0]["tag"] != ';':
         return ast, tokens
-    
     current_ast = {
-        'tag': 'list',
-        'statement': ast,
-        'list': None
+        'tag':'list',
+        'statement':ast,
+        'list':None
     }
-
     top_ast = current_ast
-    while tokens [0]["tag"] == ';' :
-        #Consume semicollion (;)
+    while tokens[0]["tag"] == ';':
         tokens = tokens[1:]
         ast, tokens = parse_statement(tokens)
-        current_ast["list"] = {
-            'tag': 'list',
-            'statement': ast,
-            'list': None
+        current_ast['list'] = {
+            'tag':'list',
+            'statement':ast,
+            'list':None
         }
-
-        current_ast = current_ast["list"]
-
+        current_ast = current_ast['list']
     return top_ast, tokens
 
-     
-
 def test_parse_statement_list():
-    print("testing parse_statement_list")
-    tokens = tokenize("2+3*4+5")
+    """
+    statement_list = statement { ";" statement } {";"}
+    """
+    print("test parse_statement_list")
+    tokens = tokenize("4+5")
     assert parse_statement_list(tokens) == parse_statement(tokens)
     tokens = tokenize("print(4);print(5)")
     ast, tokens = parse_statement_list(tokens)
     print(ast)
-
+    exit()
 
 
 def parse_program(tokens):
@@ -415,15 +411,15 @@ def parse_program(tokens):
     return parse_statement_list(tokens)
 
 def test_parse_program():
-    print("testing parse_program")
+    """
+    program = statement_list
+    """
+    print("test parse_program")
     tokens = tokenize("2+3*4+5")
-    assert parse_program(tokens) == parse_statement_list(tokens)
-
-
-
+    assert parse_program(tokens) == parse__statement_list(tokens)
 
 def parse(tokens):
-    ast, tokens = parse_statement(tokens)
+    ast, tokens = parse_program(tokens)
     return ast 
 
 def test_parse():

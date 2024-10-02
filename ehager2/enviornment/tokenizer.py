@@ -29,7 +29,7 @@ patterns = [
     ["function", "function"],
     ["return", "return"],
     ["(\\d+\\.\\d*)|(\\d*\\.\\d+)|(\\d+)", "number"],
-    ["[A-Za-z_][A-Za-z0-9_]*","identifier"],
+    ["[A-Za-z_][A-Za-z0-9_]*", "identifier"],
     ["\\&\\&", "&&"],
     ["\\|\\|", "||"],
     ["!", "!"],
@@ -98,6 +98,11 @@ def test_identifier_tokens():
         assert tokens[0]["tag"] == "identifier"
         assert tokens[0]["value"] == s
 
+def test_whitespace():
+    print("testing whitespace")
+    for s in [" ", "\t", "\n"]:
+        tokens = tokenize(s)
+        assert tokens[0]["tag"] == "whitespace"
 
 if __name__ == "__main__":
     test_simple_tokens()
