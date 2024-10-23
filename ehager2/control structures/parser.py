@@ -4,12 +4,7 @@ parser.py -- implement parser for simple expressions
 Accept a string of tokens, return an AST expressed as stack of dictionaries
 """
 """
-    simple_expression = number | identifier [ "(" argument_list ")" ] | "(" expression ")" | "-" simple_expression
-    argument_list = [ expression { "," expression } ]
-    argument_statement = expression
-    #parameter = identifier [ "=" expression ]
-    #parameter_list = [ parameter { "=" parameter } ]
-
+    simple_expression = number | identifier | "(" expression ")" | "-" simple_expression
     factor = simple_expression
     term = factor { "*"|"/" factor }
     arithmetic_expression = term { "+"|"-" term }
@@ -18,16 +13,15 @@ Accept a string of tokens, return an AST expressed as stack of dictionaries
     boolean_expression == boolean_term { "||" boolean_term }
     expression = boolean_expression
     print_statement = "print" "(" expression ")"
-    if_statement = "if" "(" boolean_expression ")" { "else" statement }
+    if_statement = "if" "(" boolean_expression ")" statement { "else" statement }
+    while_statement = "while" "(" boolean_expression ")" statement
     assignment_statement = expression
-    parameter_list = [ identifier { "," identifier } ]
-    function_statement = "function" identifier "(" paramenter_list ")" "{" statement_list "}"
     statement = print_statement |
                 if_statement |
-                while_statement |
+                while_statement | 
                 "{" statement_list "}"
                 assignment_expression
-    statement_list = [ statement { ";" statement } {";"} ]
+    statement_list = statement { ";" statement } {";"}
     program = statement_list
 """
 
@@ -35,33 +29,14 @@ from pprint import pprint
 
 from tokenizer import tokenize
 
-def parse_argument_list(tokens):
-    arguments = []
-    while tokens[0]["tag"] != ')':
-        expression, tokens = parse_expression(tokens)
-        arguments.append(expression)
-        assert tokens[0]["tag"] in [",", ")"], "Expected ',' or ')'"
-        tokens = tokens[1:]
-    return arguments, tokens
-
-
 def parse_simple_expression(tokens):
     """
-    simple_expression = number | identifier [ "(" argument_list ")" ] | "(" expression ")" | "-" simple_expression
+    simple_expression = number | identifier | "(" expression ")" | "-" simple_expression
     """
     if tokens[0]["tag"] == "number":
         return tokens[0], tokens[1:]
     if tokens[0]["tag"] == "identifier":
-        identifier = tokens[0]
-        tokens = tokens[1:]
-        if tokens[0] == "(":
-            arguments, tokens = parse_argument_list(tokens[1:])
-            assert tokens[0]["tag"] == ")", "Error: expected ')'"
-            tokens = tokens[1:]
-            node = identifier
-            node["arguments"] = arguments
-            return node, tokens
-        return identifier, tokens
+        return tokens[0], tokens[1:]
     if tokens[0]["tag"] == "(":
         node, tokens = parse_expression(tokens[1:])
         assert tokens[0]["tag"] == ")", "Error: expected ')'"
@@ -74,7 +49,7 @@ def parse_simple_expression(tokens):
 
 def test_parse_simple_expression():
     """
-    simple_expression = number | identifier [ "(" argument_list ")" ] | "(" expression ")" | "-" simple_expression
+    simple_expression = number | identifier | "(" expression ")" | "-" simple_expression
     """
     print("testing parse_simple_expression")
     tokens = tokenize("2")
@@ -86,11 +61,6 @@ def test_parse_simple_expression():
     assert ast["tag"] == "identifier"
     assert ast["value"] == "X"
     # pprint(ast)
-    tokens = tokenize("X()")
-    ast, tokens = parse_simple_expression(tokens)
-    #assert ast["tag"] == "identifier"
-    pprint(ast)
-    exit(0)
     tokens = tokenize("(2)")
     ast, tokens = parse_simple_expression(tokens)
     assert ast["tag"] == "number"
@@ -448,10 +418,9 @@ def test_parse_if_statement():
         },
     }
 
-
 def parse_while_statement(tokens):
     """
-    if_statement = "if" "(" boolean_expression ")" { "else" statement }
+    while_statement = "while" "(" boolean_expression ")" statement
     """
     assert tokens[0]["tag"] == "while"
     tokens = tokens[1:]
@@ -467,16 +436,39 @@ def parse_while_statement(tokens):
 def test_parse_while_statement():
     print("testing parse_while_statement")
     """
-    if_statement = "if" "(" boolean_expression ")" { "else" statement }
+    while_statement = "while" "(" boolean_expression ")" statement
     """
     ast, tokens = parse_while_statement(tokenize("while(1)2"))
-    
 
-    assert ast == {'tag': 'while', 'condition': {'tag': 'number', 'value': 1, 'position': 6}, 'do': {'tag': 'number', 'value': 2, 'position': 8}}
-    
+    assert ast == {
+        "tag": "while",
+        "condition": {"tag": "number", "value": 1, "position": 6},
+        "do": {"tag": "number", "value": 2, "position": 8},
+    }
     ast, tokens = parse_while_statement(tokenize("while(1==1){print(3);print(4)}"))
-    assert ast == {'tag': 'while', 'condition': {'tag': '==', 'left': {'tag': 'number', 'value': 1, 'position': 6}, 'right': {'tag': 'number', 'value': 1, 'position': 9}}, 'do': {'tag': 'list', 'statement': {'tag': 'print', 'value': {'tag': 'number', 'value': 3, 'position': 18}}, 'list': {'tag': 'list', 'statement': {'tag': 'print', 'value': {'tag': 'number', 'value': 4, 'position': 27}}, 'list': None}}}
-
+    assert ast == {
+        "tag": "while",
+        "condition": {
+            "tag": "==",
+            "left": {"tag": "number", "value": 1, "position": 6},
+            "right": {"tag": "number", "value": 1, "position": 9},
+        },
+        "do": {
+            "tag": "list",
+            "statement": {
+                "tag": "print",
+                "value": {"tag": "number", "value": 3, "position": 18},
+            },
+            "list": {
+                "tag": "list",
+                "statement": {
+                    "tag": "print",
+                    "value": {"tag": "number", "value": 4, "position": 27},
+                },
+                "list": None,
+            },
+        },
+    }
 
 def parse_assignment_statement(tokens):
     """
@@ -518,8 +510,8 @@ def parse_statement(tokens):
         return parse_print_statement(tokens) 
     if tokens[0]["tag"] == "if":
         return parse_if_statement(tokens)
-#    if tokens[0]["tag"] == "while":
-#        return parse_while_statement(tokens)
+    if tokens[0]["tag"] == "while":
+        return parse_while_statement(tokens)
     if tokens[0]["tag"] == "{":
         ast, tokens = parse_statement_list(tokens[1:])
         assert tokens[0]["tag"] == "}"
