@@ -82,5 +82,7 @@ def test_simple_tokens():
 
 
 if __name__ == "__main__":
-    test_simple_tokens()
+    #test_simple_tokens()
+    
+    print (tokenize("3+2"))
     print("done.")
